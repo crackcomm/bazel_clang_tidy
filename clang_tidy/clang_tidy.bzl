@@ -178,7 +178,7 @@ def _clang_tidy_aspect_impl(target, ctx):
         return []
 
     # Ignore external targets
-    if target.label.workspace_root.startswith("external"):
+    if not ctx.attr.clang_tidy_check_external and target.label.workspace_root.startswith("external"):
         return []
 
     # Targets with specific tags will not be formatted
@@ -244,6 +244,7 @@ clang_tidy_aspect = aspect(
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
+        "clang_tidy_check_external": attr.bool(default = False),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
