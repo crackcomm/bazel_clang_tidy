@@ -40,6 +40,10 @@ def _run_tidy(
 
     args.add(config.path)
 
+    # This is a hint to clang-tidy to not even bother diagnosing
+    # system headers, which can sometimes provide an extra speedup.
+    args.add("-system-headers")
+
     args.add("--export-fixes", outfile.path)
 
     # add source to check
@@ -64,7 +68,10 @@ def _run_tidy(
             args.add("-F" + i)
 
         for i in compilation_context.includes.to_list():
-            args.add("-I" + i)
+            if i.startswith("external/") or "external/" in i:
+                args.add("-isystem", i)
+            else:
+                args.add("-I", i)
 
         args.add_all(compilation_context.quote_includes.to_list(), before_each = "-iquote")
 
